@@ -3,378 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X42 [PROJEXT 42] - Neural Interface & AI Core</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
-
+    <title>X42 [PROJEXT 42] - Neural Interface</title>
     <style>
         :root {
+            --bg-deep: #030308;
             --neon-cyan: #00f3ff;
-            --neon-pink: #ff00ea;
-            --neon-green: #00ff66;
-            --neon-red: #ff3333;
-            --dark-bg: #050505;
+            --neon-pink: #ff0055;
+            --neon-purple: #9d00ff;
+            --text-glow: 0 0 10px rgba(0, 243, 255, 0.6);
         }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', monospace; }
         body {
-            margin: 0;
-            overflow: hidden;
-            background-color: var(--dark-bg);
-            font-family: 'Rajdhani', sans-serif;
-            color: white;
-            user-select: none;
-        }
-
-        h1, h2, h3, .orbitron {
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        #canvas-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 0;
-        }
-
-        #ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            pointer-events: none;
-        }
-
-        .glitch {
-            position: relative;
-            text-shadow: 0.05em 0 0 rgba(255,0,0,0.75), -0.025em -0.05em 0 rgba(0,255,0,0.75), 0.025em 0.05em 0 rgba(0,0,255,0.75);
-            animation: glitch 500ms infinite;
-        }
-
-        @keyframes glitch {
-            0% { text-shadow: 0.05em 0 0 rgba(255,0,0,0.75), -0.05em -0.025em 0 rgba(0,255,0,0.75), -0.025em 0.05em 0 rgba(0,0,255,0.75); }
-            14% { text-shadow: 0.05em 0 0 rgba(255,0,0,0.75), -0.05em -0.025em 0 rgba(0,255,0,0.75), -0.025em 0.05em 0 rgba(0,0,255,0.75); }
-            15% { text-shadow: -0.05em -0.025em 0 rgba(255,0,0,0.75), 0.025em 0.025em 0 rgba(0,255,0,0.75), -0.05em -0.05em 0 rgba(0,0,255,0.75); }
-            49% { text-shadow: -0.05em -0.025em 0 rgba(255,0,0,0.75), 0.025em 0.025em 0 rgba(0,255,0,0.75), -0.05em -0.05em 0 rgba(0,0,255,0.75); }
-            50% { text-shadow: 0.025em 0.05em 0 rgba(255,0,0,0.75), 0.05em 0 0 rgba(0,255,0,0.75), 0 -0.05em 0 rgba(0,0,255,0.75); }
-            99% { text-shadow: 0.025em 0.05em 0 rgba(255,0,0,0.75), 0.05em 0 0 rgba(0,255,0,0.75), 0 -0.05em 0 rgba(0,0,255,0.75); }
-            100% { text-shadow: -0.025em 0 0 rgba(255,0,0,0.75), -0.025em -0.025em 0 rgba(0,255,0,0.75), -0.025em -0.05em 0 rgba(0,0,255,0.75); }
-        }
-
-        .glass-card {
-            background: rgba(10, 10, 15, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            pointer-events: auto;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .glass-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
-        }
-
-        .glass-card.active {
-            border-color: var(--neon-pink);
-            box-shadow: 0 0 30px rgba(255, 0, 234, 0.6), inset 0 0 20px rgba(255, 0, 234, 0.3);
-            transform: translateY(-12px) scale(1.04);
-        }
-        
-        .glass-card.active .status-indicator {
-            background-color: var(--neon-pink);
-            box-shadow: 0 0 10px var(--neon-pink);
-        }
-
-        #init-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #000;
-            z-index: 50;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            pointer-events: auto;
-            transition: opacity 1s ease-out;
-        }
-
-        .cyber-btn {
-            background: transparent;
+            background-color: var(--bg-deep);
             color: var(--neon-cyan);
-            border: 2px solid var(--neon-cyan);
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            overflow-x: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+        header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(3, 3, 8, 0.85);
+            border-bottom: 1px solid var(--neon-cyan);
+            box-shadow: var(--text-glow);
+            z-index: 10;
+        }
+        h1 { font-size: 1.5rem; letter-spacing: 3px; color: #fff; text-shadow: 0 0 10px var(--neon-pink); }
+        p { font-size: 0.8rem; color: #88aacc; margin-top: 5px; }
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            z-index: 10;
+            padding: 20px;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: rgba(10, 10, 25, 0.8);
+            border: 1px solid var(--neon-cyan);
+            padding: 20px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+            position: relative;
+            overflow: hidden;
         }
-
-        .cyber-btn:hover {
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 25px rgba(255, 0, 85, 0.4);
+        }
+        .card.active {
+            border-color: var(--neon-purple);
+            background: rgba(30, 10, 40, 0.85);
+            box-shadow: 0 0 30px rgba(157, 0, 255, 0.6);
+        }
+        .card h3 { font-size: 1rem; color: #fff; margin-bottom: 8px; }
+        .card p { font-size: 0.75rem; color: #ccd; }
+        .control-panel {
+            background: rgba(5, 5, 15, 0.9);
+            border: 1px solid var(--neon-pink);
+            padding: 15px 30px;
+            border-radius: 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
+            z-index: 10;
+        }
+        button {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+        button:hover {
             background: var(--neon-cyan);
-            color: #000;
-            box-shadow: 0 0 20px var(--neon-cyan);
+            color: var(--bg-deep);
+            box-shadow: var(--text-glow);
         }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.3);
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(0, 243, 255, 0.4);
-            border-radius: 3px;
+        footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 0.7rem;
+            background: rgba(3, 3, 8, 0.9);
+            border-top: 1px solid #223;
+            z-index: 10;
+            color: #557799;
         }
     </style>
 </head>
 <body>
 
-    <div id="canvas-container"></div>
+    <!-- Background 3D Neon Grid / Canvas -->
+    <canvas id="bgCanvas"></canvas>
 
-    <div id="init-overlay">
-        <h1 class="text-4xl md:text-6xl text-white mb-4 orbitron glitch tracking-widest text-center">SYSTEM [X42]</h1>
-        <p class="text-gray-400 mb-8 max-w-md text-center px-4">Warning: Neural link requires audio capabilities and active AI channel sync.</p>
-        <button id="start-btn" class="cyber-btn orbitron font-bold">Initiate Neural Link</button>
-    </div>
+    <header>
+        <h1>X42 [PROJEXT 42] NEURAL INTERFACE</h1>
+        <p>Select a symbiotic node to sync frequency channels and neural visualizers.</p>
+    </header>
 
-    <div id="ui-layer" class="p-4 md:p-6 flex flex-col justify-between opacity-0 transition-opacity duration-1000">
-        
-        <!-- Header -->
-        <header class="flex justify-between items-center bg-black/60 backdrop-blur-md px-6 py-3 rounded-xl border border-cyan-500/30 pointer-events-auto">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-black orbitron tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-500 drop-shadow-[0_0_10px_rgba(0,243,255,0.8)]">X42 <span class="text-white">[PROJEXT 42]</span></h1>
-                <p class="text-xs text-cyan-300 uppercase tracking-[0.2em]">Audiovisual Synthesis & AI Neural Core</p>
+    <div class="main-container">
+        <div class="cards-grid">
+            <div class="card" data-freq="220" onclick="activateNode(this, 'Urban Symbiosis & Insect Hives')">
+                <h3>01 / INSECT HIVE</h3>
+                <p>Urban micro-climate regulation & vertical food security grids.</p>
             </div>
-            <div class="flex items-center gap-3">
-                <button id="ai-audio-brief-btn" class="bg-pink-500/20 border border-pink-400 text-pink-300 px-3 py-2 rounded-lg font-orbitron text-xs tracking-wider hover:bg-pink-400 hover:text-black transition-all flex items-center gap-1.5">
-                    <span>🎙️ AUDIO BRIEF</span>
-                </button>
-                <div class="text-right hidden sm:block">
-                    <div class="text-[10px] text-gray-400 uppercase tracking-widest">Global Status</div>
-                    <div id="status-text" class="text-pink-500 orbitron font-bold text-sm">AWAITING INPUT</div>
-                </div>
-                <button id="ai-toggle-btn" class="bg-cyan-500/20 border border-cyan-400 text-cyan-300 px-4 py-2 rounded-lg font-orbitron text-sm tracking-wider hover:bg-cyan-400 hover:text-black transition-all flex items-center gap-2">
-                    <span>🧠 AI NEURAL CHAT</span>
-                </button>
+            <div class="card" data-freq="330" onclick="activateNode(this, 'Smart Economy & Resource Flow')">
+                <h3>02 / SMART ECONOMY</h3>
+                <p>Equitable distribution, lowering criminality & restoring wealth.</p>
             </div>
-        </header>
+            <div class="card" data-freq="440" onclick="activateNode(this, 'Demographic & Disabled Support')">
+                <h3>03 / HUMAN SHIELD</h3>
+                <p>Decentralized aids, accessibility nodes, and protective care tracks.</p>
+            </div>
+            <div class="card" data-freq="550" onclick="activateNode(this, 'Global Justice & Coexistence')">
+                <h3>04 / EILVERFAHREN</h3>
+                <p>The 3.5% critical mass awakening. Justice roundhouse execution.</p>
+            </div>
+        </div>
 
-        <!-- Main Content Area -->
-        <main class="flex-grow flex flex-col justify-center items-center my-4">
-            <div class="text-center mb-6 pointer-events-auto max-w-3xl">
-                <p class="text-gray-300 text-sm md:text-base leading-relaxed bg-black/50 p-4 rounded-xl border border-gray-800 backdrop-blur-md shadow-2xl">
-                    Select conceptual cards below to unbind their generative frequencies and audio stems. Art and waves connect neural dots to ignite the 3.5% critical mass.
-                </p>
-            </div>
-
-            <!-- Card Grid / Minigame Board -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-7xl px-2 pointer-events-auto">
-                
-                <!-- Card 1: The Awakening -->
-                <div class="glass-card p-5 rounded-xl flex flex-col h-56" data-card="0" data-color="0xff3333">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] font-bold text-gray-400 tracking-widest uppercase">Card 01 // Catalyst</span>
-                        <div class="status-indicator w-2.5 h-2.5 rounded-full bg-gray-600 transition-colors duration-300"></div>
-                    </div>
-                    <h2 class="text-lg orbitron text-white mb-2 uppercase">The Awakening</h2>
-                    <p class="text-xs text-gray-300 flex-grow">Breaking the trauma script. A deep, relentless bass pulse pushing through static data.</p>
-                    <div class="mt-auto border-t border-gray-800 pt-2 flex justify-between items-center">
-                        <span class="text-[10px] text-red-400 font-mono">BASS SYNTH // 40Hz</span>
-                        <div class="flex gap-2">
-                            <span class="text-[10px] text-pink-400 underline cursor-pointer ai-analyze-card" data-card-title="The Awakening" data-topic="Breaking the trauma script and igniting personal and collective awakening">Analyze</span>
-                            <span class="text-[10px] text-cyan-300 underline cursor-pointer query-ai-btn" data-topic="The Awakening and critical mass breakthrough">Consult AI</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 2: Smart Economy -->
-                <div class="glass-card p-5 rounded-xl flex flex-col h-56" data-card="1" data-color="0x00f3ff">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] font-bold text-gray-400 tracking-widest uppercase">Card 02 // Optimizer</span>
-                        <div class="status-indicator w-2.5 h-2.5 rounded-full bg-gray-600 transition-colors duration-300"></div>
-                    </div>
-                    <h2 class="text-lg orbitron text-white mb-2 uppercase">Smart Economy</h2>
-                    <p class="text-xs text-gray-300 flex-grow">Optimizing resources. Turning down the fever. Rapid calculated data streams rebuilding structures.</p>
-                    <div class="mt-auto border-t border-gray-800 pt-2 flex justify-between items-center">
-                        <span class="text-[10px] text-cyan-400 font-mono">ARPEGGIATOR // 16th</span>
-                        <div class="flex gap-2">
-                            <span class="text-[10px] text-pink-400 underline cursor-pointer ai-analyze-card" data-card-title="Smart Economy" data-topic="Designing a resilient smart economy that eliminates resource waste">Analyze</span>
-                            <span class="text-[10px] text-cyan-300 underline cursor-pointer query-ai-btn" data-topic="Smart economy and sustainable resource optimization">Consult AI</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 3: Earth Healing -->
-                <div class="glass-card p-5 rounded-xl flex flex-col h-56" data-card="2" data-color="0x00ff66">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] font-bold text-gray-400 tracking-widest uppercase">Card 03 // Resonance</span>
-                        <div class="status-indicator w-2.5 h-2.5 rounded-full bg-gray-600 transition-colors duration-300"></div>
-                    </div>
-                    <h2 class="text-lg orbitron text-white mb-2 uppercase">Earth Healing</h2>
-                    <p class="text-xs text-gray-300 flex-grow">Saving water and cooling planetary fires. Wide protective atmospheric harmony.</p>
-                    <div class="mt-auto border-t border-gray-800 pt-2 flex justify-between items-center">
-                        <span class="text-[10px] text-green-400 font-mono">ETHEREAL PAD // SPATIAL</span>
-                        <div class="flex gap-2">
-                            <span class="text-[10px] text-pink-400 underline cursor-pointer ai-analyze-card" data-card-title="Earth Healing" data-topic="Planetary cooling, water restoration, and biosphere healing">Analyze</span>
-                            <span class="text-[10px] text-cyan-300 underline cursor-pointer query-ai-btn" data-topic="Earth healing, water preservation and cooling planetary fires">Consult AI</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 4: Justice Roundhouse -->
-                <div class="glass-card p-5 rounded-xl flex flex-col h-56" data-card="3" data-color="0xff00ea">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] font-bold text-gray-400 tracking-widest uppercase">Card 04 // Action</span>
-                        <div class="status-indicator w-2.5 h-2.5 rounded-full bg-gray-600 transition-colors duration-300"></div>
-                    </div>
-                    <h2 class="text-lg orbitron text-white mb-2 uppercase">Justice Roundhouse</h2>
-                    <p class="text-xs text-gray-300 flex-grow">The Eilverfahren. Swift undeniable action. The heavy percussive heartbeat of immediate change.</p>
-                    <div class="mt-auto border-t border-gray-800 pt-2 flex justify-between items-center">
-                        <span class="text-[10px] text-pink-400 font-mono">KICK & GLITCH // 120BPM</span>
-                        <div class="flex gap-2">
-                            <span class="text-[10px] text-pink-400 underline cursor-pointer ai-analyze-card" data-card-title="Justice Roundhouse" data-topic="Swift legal and structural actions for systemic justice">Analyze</span>
-                            <span class="text-[10px] text-cyan-300 underline cursor-pointer query-ai-btn" data-topic="Justice Roundhouse and swift Eilverfahren systemic action">Consult AI</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </main>
-        
-        <!-- Footer / Visualizer -->
-        <footer class="flex justify-between items-end bg-black/60 backdrop-blur-md px-6 py-3 rounded-xl border border-gray-800 pointer-events-auto">
-            <div class="text-[11px] text-gray-400 font-mono flex items-center gap-4 flex-wrap">
-                <div><span id="fps-counter">SYS_FPS: 60</span> | ACTIVE_NODES: <span id="active-count">0</span>/4 | AUDIO_ENGINE: <span id="audio-status" class="text-yellow-400">STANDBY</span></div>
-                <div class="flex gap-2">
-                    <button id="ai-generate-strategy" class="bg-pink-500/20 border border-pink-400 text-pink-300 px-3 py-1 rounded text-xs font-orbitron hover:bg-pink-400 hover:text-black transition-all">✨ AI STRATEGY BRIEF</button>
-                    <button id="ai-custom-card-btn" class="bg-cyan-500/20 border border-cyan-400 text-cyan-300 px-3 py-1 rounded text-xs font-orbitron hover:bg-cyan-400 hover:text-black transition-all">⚡ GENERATE NEW CARD (STRUCTURED AI)</button>
-                </div>
-            </div>
-            <div class="flex space-x-1 h-6 items-end" id="audio-visualizer">
-                <!-- Bars added by JS -->
-            </div>
-        </footer>
-    </div>
-
-    <!-- Modal for AI Chat & Structured Content -->
-    <div id="ai-modal" class="fixed inset-0 z-40 bg-black/80 backdrop-blur-md flex justify-center items-center p-4 opacity-0 pointer-events-none transition-all duration-300">
-        <div class="glass-card w-full max-w-2xl h-[85vh] rounded-2xl flex flex-col border border-cyan-500/40 shadow-[0_0_50px_rgba(0,243,255,0.2)]">
-            <!-- Modal Header -->
-            <div class="flex justify-between items-center px-6 py-4 border-b border-gray-800 bg-black/40">
-                <div class="flex items-center space-x-3">
-                    <div class="w-3 h-3 rounded-full bg-cyan-400 animate-ping"></div>
-                    <h3 id="ai-modal-title" class="orbitron font-bold text-cyan-300 tracking-wider">X42 NEURAL AI CORE</h3>
-                </div>
-                <button id="ai-close-btn" class="text-gray-400 hover:text-white font-mono text-xl">&times;</button>
-            </div>
-            <!-- Chat Messages / Content Area -->
-            <div id="ai-chat-messages" class="flex-grow p-6 overflow-y-auto custom-scrollbar space-y-4 text-sm">
-                <div class="bg-cyan-950/40 border border-cyan-500/30 p-4 rounded-xl">
-                    <p class="text-cyan-300 font-orbitron text-xs mb-1">SYSTEM AI GUIDE</p>
-                    <p class="text-gray-200">Welcome, user. I am your neural companion on X42. Let's discuss world peace, smart economies, environmental recovery, or how to ignite the 3.5% critical mass. How can I assist your vision today?</p>
-                </div>
-            </div>
-            <!-- Audio Brief Player Container (hidden by default) -->
-            <div id="audio-brief-player-container" class="hidden px-6 py-3 bg-pink-950/30 border-t border-pink-500/30 flex items-center justify-between">
-                <div class="text-xs text-pink-300 font-mono flex items-center gap-2">
-                    <span class="animate-pulse">🎙️</span> <span id="audio-brief-status">Synthesizing audio briefing via Gemini TTS...</span>
-                </div>
-                <audio id="brief-audio-element" controls class="h-8 max-w-[250px]"></audio>
-            </div>
-            <!-- Input Area -->
-            <div class="p-4 border-t border-gray-800 bg-black/60 flex gap-3">
-                <input type="text" id="ai-input" placeholder="Ask the neural core or discuss project strategies..." class="flex-grow bg-black/80 border border-cyan-500/40 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400 font-rajdhani">
-                <button id="ai-send-btn" class="bg-cyan-500 hover:bg-cyan-400 text-black font-orbitron font-bold px-6 py-3 rounded-xl transition-all text-xs tracking-wider">TRANSMIT</button>
-            </div>
+        <div class="control-panel">
+            <span id="statusText">STATUS: WAITING FOR USER INPUT...</span>
+            <button onclick="toggleAudioSystem()">INITIALIZE AUDIO SYNC</button>
         </div>
     </div>
 
+    <footer>
+        X42 CORE SYNC // OPEN SOURCE REPO READY // MEMORY IS RESISTANCE
+    </footer>
+
+    <!-- Stable Vanilla JS Three.js & Web Audio Implementation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        // --- STREAMING_CHUNK:Initializing 3D Environment & State Variables... ---
-        const container = document.getElementById('canvas-container');
+        // --- THREE.JS BACKGROUND SCENE ---
+        const canvas = document.getElementById('bgCanvas');
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x050505, 0.02);
-
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 5, 20);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        container.appendChild(renderer.domElement);
 
-        let targetGridColor = new THREE.Color(0x00f3ff);
-        let currentGridColor = new THREE.Color(0x00f3ff);
-        let gridSpeed = 0.02;
-        let gridSpeedTarget = 0.02;
-        const cardStates = [false, false, false, false];
+        // Create Neon Grid
+        const gridHelper = new THREE.GridHelper(200, 50, 0xff0055, 0x00f3ff);
+        gridHelper.position.set(0, -10, 0);
+        scene.add(gridHelper);
 
-        const gridGeometry = new THREE.PlaneGeometry(200, 200, 60, 60);
-        const gridMaterial = new THREE.MeshBasicMaterial({ 
-            color: currentGridColor, 
-            wireframe: true,
-            transparent: true,
-            opacity: 0.15
-        });
-        const grid = new THREE.Mesh(gridGeometry, gridMaterial);
-        grid.rotation.x = -Math.PI / 2;
-        grid.position.y = -5;
-        scene.add(grid);
-
-        const nodes = [];
-        const nodeGeometry = new THREE.IcosahedronGeometry(1, 1);
+        // Create Floating Neural Spheres
+        const sphereGroup = new THREE.Group();
+        const sphereGeo = new THREE.SphereGeometry(0.8, 16, 16);
+        const materialCyan = new THREE.MeshBasicMaterial({ color: 0x00f3ff, wireframe: true });
         
-        for(let i=0; i<15; i++) {
-            const nodeMaterial = new THREE.MeshBasicMaterial({
-                color: 0xffffff,
-                wireframe: true,
-                transparent: true,
-                opacity: 0.3
-            });
-            const node = new THREE.Mesh(nodeGeometry, nodeMaterial);
-            node.position.x = (Math.random() - 0.5) * 40;
-            node.position.y = (Math.random() - 0.5) * 20 + 5;
-            node.position.z = (Math.random() - 0.5) * 40 - 10;
-            
-            node.userData = {
-                rx: (Math.random() - 0.5) * 0.02,
-                ry: (Math.random() - 0.5) * 0.02,
-                baseY: node.position.y
-            };
-            nodes.push(node);
-            scene.add(node);
+        for (let i = 0; i < 15; i++) {
+            const mesh = new THREE.Mesh(sphereGeo, materialCyan);
+            mesh.position.set(
+                (Math.random() - 0.5) * 60,
+                Math.random() * 20 - 5,
+                (Math.random() - 0.5) * 60 - 20
+            );
+            sphereGroup.add(mesh);
         }
+        scene.add(sphereGroup);
+        camera.position.z = 15;
 
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 600;
-        const posArray = new Float32Array(particlesCount * 3);
-        for(let i = 0; i < particlesCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 100;
+        // Render loop
+        function animate() {
+            requestAnimationFrame(animate);
+            gridHelper.position.z += 0.05;
+            if (gridHelper.position.z > 10) gridHelper.position.z = 0;
+            sphereGroup.rotation.y += 0.002;
+            renderer.render(scene, camera);
         }
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.1,
-            color: 0x00f3ff,
-            transparent: true,
-            opacity: 0.5,
-            blending: THREE.AdditiveBlending
-        });
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        scene.add(particlesMesh);
+        animate();
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -382,484 +206,50 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // --- STREAMING_CHUNK:Configuring Tone.js Audio Engine... ---
-        const audioEngine = {
-            ready: false,
-            bpm: 120,
-            synths: {}
-        };
+        // --- WEB AUDIO SYNTHESIZER ENGINE ---
+        let audioCtx = null;
+        let oscillator = null;
+        let gainNode = null;
+        let audioActive = false;
 
-        async function initAudio() {
-            await Tone.start();
-            Tone.Transport.bpm.value = audioEngine.bpm;
+        function toggleAudioSystem() {
+            if (!audioActive) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                oscillator = audioCtx.createOscillator();
+                gainNode = audioCtx.createGain();
 
-            const reverb = new Tone.Reverb({ decay: 4, wet: 0.4 }).toDestination();
-            const delay = new Tone.PingPongDelay("8n", 0.2).connect(reverb);
-            
-            const baseDrone = new Tone.FMSynth({
-                harmonicity: 0.5,
-                modulationIndex: 1.2,
-                oscillator: { type: "sine" },
-                envelope: { attack: 2, decay: 1, sustain: 1, release: 4 }
-            }).connect(reverb);
-            baseDrone.volume.value = -20;
-            
-            const bass = new Tone.MonoSynth({
-                oscillator: { type: "sawtooth" },
-                filter: { Q: 2, type: "lowpass", rolloff: -24 },
-                envelope: { attack: 0.01, decay: 0.2, sustain: 0.2, release: 0.5 },
-                filterEnvelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.5, baseFrequency: 100, octaves: 3 }
-            }).toDestination();
-            bass.volume.value = -Infinity;
-
-            const arp = new Tone.FMSynth({
-                envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
-            }).connect(delay);
-            arp.volume.value = -Infinity;
-
-            const pad = new Tone.PolySynth(Tone.Synth, {
-                oscillator: { type: "triangle" },
-                envelope: { attack: 1.5, decay: 1, sustain: 0.8, release: 3 }
-            }).connect(reverb);
-            pad.volume.value = -Infinity;
-
-            const kick = new Tone.MembraneSynth({
-                pitchDecay: 0.05,
-                octaves: 4,
-                oscillator: { type: "sine" },
-                envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 }
-            }).toDestination();
-            kick.volume.value = -Infinity;
-
-            audioEngine.synths = { baseDrone, bass, arp, pad, kick };
-
-            Tone.Transport.scheduleRepeat(time => {
-                baseDrone.triggerAttackRelease("C2", "1m", time);
-            }, "1m");
-
-            new Tone.Sequence((time, note) => {
-                bass.triggerAttackRelease(note, "16n", time);
-            }, ["C2", null, "C2", null, "Eb2", null, "C2", "G1"], "8n").start(0);
-
-            new Tone.Sequence((time, note) => {
-                arp.triggerAttackRelease(note, "32n", time);
-            }, ["C4", "Eb4", "G4", "Bb4", "C5", "Bb4", "G4", "Eb4"], "16n").start(0);
-
-            new Tone.Sequence((time, chord) => {
-                pad.triggerAttackRelease(chord, "2m", time);
-            }, [["C3", "Eb3", "G3", "C4"], ["Ab2", "C3", "Eb3", "G3"]], "2m").start(0);
-
-            new Tone.Sequence((time, note) => {
-                kick.triggerAttackRelease("C1", "8n", time);
-            }, ["C1", null, null, null, "C1", null, null, null], "16n").start(0);
-
-            Tone.Transport.start();
-            audioEngine.ready = true;
-            document.getElementById('audio-status').innerText = "ONLINE";
-            document.getElementById('audio-status').className = "text-green-400";
-        }
-
-        // --- STREAMING_CHUNK:Setting up Visualizer and Interactivity... ---
-        const visContainer = document.getElementById('audio-visualizer');
-        for(let i=0; i<16; i++) {
-            const bar = document.createElement('div');
-            bar.className = 'w-1.5 bg-cyan-900 rounded-t-sm transition-all duration-75';
-            bar.style.height = '4px';
-            visContainer.appendChild(bar);
-        }
-
-        document.getElementById('start-btn').addEventListener('click', async () => {
-            document.getElementById('start-btn').innerText = "CONNECTING...";
-            await initAudio();
-            document.getElementById('init-overlay').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('init-overlay').style.display = 'none';
-                document.getElementById('ui-layer').classList.remove('opacity-0');
-            }, 1000);
-        });
-
-        // Card Selection / Minigame Mechanics
-        document.querySelectorAll('.glass-card[data-card]').forEach(cardEl => {
-            cardEl.addEventListener('click', (e) => {
-                if (e.target.closest('.ai-analyze-card') || e.target.closest('.query-ai-btn')) return;
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(220, audioCtx.currentTime);
                 
-                const cardIndex = parseInt(cardEl.dataset.card);
-                cardStates[cardIndex] = !cardStates[cardIndex];
-                cardEl.classList.toggle('active', cardStates[cardIndex]);
+                gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
 
-                const colorHex = parseInt(cardEl.dataset.color);
-                if (cardStates[cardIndex]) {
-                    targetGridColor.setHex(colorHex);
-                    gridSpeedTarget = 0.06;
-                } else {
-                    if (!cardStates.includes(true)) {
-                        targetGridColor.setHex(0x00f3ff);
-                        gridSpeedTarget = 0.02;
-                    }
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+
+                audioActive = true;
+                document.getElementById('statusText').innerText = "STATUS: AUDIO-NEURAL LINK ONLINE";
+            } else {
+                if (oscillator) {
+                    oscillator.stop();
+                    oscillator.disconnect();
                 }
+                audioActive = false;
+                document.getElementById('statusText').innerText = "STATUS: AUDIO SYNC PAUSED";
+            }
+        }
 
-                const activeCount = cardStates.filter(Boolean).length;
-                document.getElementById('active-count').innerText = activeCount;
-                document.getElementById('status-text').innerText = activeCount > 0 ? `${activeCount} STEMS ACTIVE` : 'AWAITING INPUT';
-
-                if (audioEngine.ready) {
-                    const synths = audioEngine.synths;
-                    if (cardIndex === 0) synths.bass.volume.value = cardStates[cardIndex] ? -6 : -Infinity;
-                    if (cardIndex === 1) synths.arp.volume.value = cardStates[cardIndex] ? -8 : -Infinity;
-                    if (cardIndex === 2) synths.pad.volume.value = cardStates[cardIndex] ? -10 : -Infinity;
-                    if (cardIndex === 3) synths.kick.volume.value = cardStates[cardIndex] ? -4 : -Infinity;
-                }
-            });
-        });
-
-        // --- STREAMING_CHUNK:Integrating Advanced Gemini API Features... ---
-        const aiModal = document.getElementById('ai-modal');
-        const aiToggleBtn = document.getElementById('ai-toggle-btn');
-        const aiCloseBtn = document.getElementById('ai-close-btn');
-        const aiChatMessages = document.getElementById('ai-chat-messages');
-        const aiInput = document.getElementById('ai-input');
-        const aiSendBtn = document.getElementById('ai-send-btn');
-        const aiModalTitle = document.getElementById('ai-modal-title');
-
-        aiToggleBtn.addEventListener('click', () => {
-            aiModalTitle.innerText = "X42 NEURAL AI CORE";
-            aiModal.classList.remove('opacity-0', 'pointer-events-none');
-        });
-        aiCloseBtn.addEventListener('click', () => {
-            aiModal.classList.add('opacity-0', 'pointer-events-none');
-        });
-
-        document.querySelectorAll('.query-ai-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const topic = e.target.dataset.topic;
-                aiModalTitle.innerText = "X42 NEURAL AI CORE // TOPIC CONSULT";
-                aiModal.classList.remove('opacity-0', 'pointer-events-none');
-                sendAiMessage(`Let's discuss ${topic} in the context of Projext 42 and our journey to world peace and smart economies.`);
-            });
-        });
-
-        document.querySelectorAll('.ai-analyze-card').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const title = e.target.dataset.cardTitle;
-                const topic = e.target.dataset.topic;
-                aiModalTitle.innerText = `X42 DEEP ANALYSIS // ${title.toUpperCase()}`;
-                aiModal.classList.remove('opacity-0', 'pointer-events-none');
-                sendAiMessage(`Provide a deep strategic breakdown for '${title}' (${topic}) focusing on how art, waves, and the 3.5% critical mass can manifest this change.`);
-            });
-        });
-
-        document.getElementById('ai-generate-strategy').addEventListener('click', () => {
-            aiModalTitle.innerText = "X42 MASTER STRATEGY BRIEF";
-            aiModal.classList.remove('opacity-0', 'pointer-events-none');
-            sendAiMessage("Generate a comprehensive 3-step actionable master strategy for Project 42 combining world peace, smart economies, and environmental cooling to reach the 3.5% tipping point.");
-        });
-
-        // 1. Structured Output Feature: Generate New Card using Gemini JSON schema
-        document.getElementById('ai-custom-card-btn').addEventListener('click', async () => {
-            aiModalTitle.innerText = "X42 STRUCTURED CARD GENERATOR";
-            aiModal.classList.remove('opacity-0', 'pointer-events-none');
+        function activateNode(element, nodeName) {
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
             
-            const promptDiv = document.createElement('div');
-            promptDiv.className = 'bg-cyan-950/40 border border-cyan-500/30 p-4 rounded-xl mr-8';
-            promptDiv.innerHTML = `<p class="text-cyan-300 font-orbitron text-xs mb-1">STRUCTURED AI GENERATOR</p><p class="text-gray-200">Requesting AI core to synthesize a brand new strategic card for Project 42 using strict JSON schema formatting...</p>`;
-            aiChatMessages.appendChild(promptDiv);
-            aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+            document.getElementById('statusText').innerText = `NODE ACTIVE: ${nodeName.toUpperCase()}`;
 
-            try {
-                const apiKey = "";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-                const payload = {
-                    contents: [{ role: 'user', parts: [{ text: "Generate a new futuristic visionary card concept for Projext 42 focused on global regenerative infrastructure or harmonious human-AI collaboration." }] }],
-                    generationConfig: {
-                        responseMimeType: "application/json",
-                        responseSchema: {
-                            type: "OBJECT",
-                            properties: {
-                                "cardTitle": { "type": "STRING", "description": "Catchy 2-3 word title for the card" },
-                                "subtitle": { "type": "STRING", "description": "Subtitle category e.g. // SYNERGY" },
-                                "description": { "type": "STRING", "description": "Short, powerful description of the card's frequency and purpose" },
-                                "frequencyTag": { "type": "STRING", "description": "Audio frequency spec e.g. HARMONIC PAD // 528Hz" },
-                                "colorHex": { "type": "STRING", "description": "Hex color code string e.g. #ff00aa" }
-                            },
-                            "propertyOrdering": ["cardTitle", "subtitle", "description", "frequencyTag", "colorHex"]
-                        }
-                    }
-                };
-
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if(response.ok) {
-                    const result = await response.json();
-                    const jsonText = result.candidates[0].content.parts[0].text;
-                    const cardData = JSON.parse(jsonText);
-
-                    const successDiv = document.createElement('div');
-                    successDiv.className = 'bg-green-950/40 border border-green-500/30 p-4 rounded-xl mr-8';
-                    successDiv.innerHTML = `<p class="text-green-400 font-orbitron text-xs mb-1">NEW CARD SYNTHESIZED SUCCESSFULLY</p>
-                        <div class="mt-2 p-3 bg-black/60 rounded-lg border border-green-500/20">
-                            <h4 class="font-orbitron text-white text-base">${escapeHtml(cardData.cardTitle)}</h4>
-                            <p class="text-xs text-cyan-300 mb-1">${escapeHtml(cardData.subtitle)} // ${escapeHtml(cardData.frequencyTag)}</p>
-                            <p class="text-xs text-gray-300">${escapeHtml(cardData.description)}</p>
-                        </div>`;
-                    aiChatMessages.appendChild(successDiv);
-                } else {
-                    throw new Error("Failed structured generation");
-                }
-            } catch(e) {
-                const errDiv = document.createElement('div');
-                errDiv.className = 'bg-red-950/40 border border-red-500/30 p-4 rounded-xl mr-8';
-                errDiv.innerHTML = `<p class="text-red-400 font-orbitron text-xs mb-1">GENERATION ERROR</p><p class="text-gray-300">Could not synthesize card at this moment. Please try again.</p>`;
-                aiChatMessages.appendChild(errDiv);
+            const freq = parseInt(element.getAttribute('data-freq'));
+            if (audioActive && oscillator && audioCtx) {
+                oscillator.frequency.exponentialRampToValueAtTime(freq, audioCtx.currentTime + 0.5);
             }
-            aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
-        });
-
-        // 2. Audio Brief Feature using Gemini TTS
-        document.getElementById('ai-audio-brief-btn').addEventListener('click', async () => {
-            aiModalTitle.innerText = "X42 AI AUDIO BRIEFING (TTS)";
-            aiModal.classList.remove('opacity-0', 'pointer-events-none');
-            const briefContainer = document.getElementById('audio-brief-player-container');
-            const briefStatus = document.getElementById('audio-brief-status');
-            const audioElement = document.getElementById('brief-audio-element');
-            briefContainer.classList.remove('hidden');
-            briefStatus.innerText = "Generating voice briefing via Gemini TTS...";
-
-            try {
-                const ttsPayload = {
-                    contents: [{
-                        parts: [{ text: "Say cheerfully and with inspiration: Welcome operator to Project 42. All systems are online. The 3.5% critical mass for world peace and environmental healing is within reach. Keep pushing forward." }]
-                    }],
-                    generationConfig: {
-                        responseModalities: ["AUDIO"],
-                        speechConfig: {
-                            voiceConfig: {
-                                prebuiltVoiceConfig: { voiceName: "Zephyr" }
-                            }
-                        }
-                    },
-                    model: "gemini-2.5-flash-preview-tts"
-                };
-
-                const ttsUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=`;
-                const ttsResp = await fetch(ttsUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(ttsPayload)
-                });
-
-                if(ttsResp.ok) {
-                    const result = await ttsResp.json();
-                    const part = result?.candidates?.[0]?.content?.parts?.[0];
-                    const audioData = part?.inlineData?.data;
-                    const mimeType = part?.inlineData?.mimeType;
-
-                    if(audioData && mimeType && mimeType.startsWith("audio/")) {
-                        const sampleRateMatch = mimeType.match(/rate=(\d+)/);
-                        const sampleRate = sampleRateMatch ? parseInt(sampleRateMatch[1], 10) : 24000;
-                        
-                        const pcmData = decodeBase64ToBuffer(audioData);
-                        const pcm16 = new Int16Array(pcmData);
-                        const wavBlob = pcmToWav(pcm16, sampleRate);
-                        audioElement.src = URL.createObjectURL(wavBlob);
-                        briefStatus.innerText = "Audio briefing ready. Press play.";
-                        audioElement.play();
-                    } else {
-                        throw new Error("Invalid audio response");
-                    }
-                } else {
-                    throw new Error("TTS Network error");
-                }
-            } catch(err) {
-                briefStatus.innerText = "Audio briefing generation failed. Neural link fallback active.";
-            }
-        });
-
-        function decodeBase64ToBuffer(base64) {
-            const binaryString = atob(base64);
-            const len = binaryString.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            return bytes.buffer;
         }
-
-        function pcmToWav(pcm16, sampleRate) {
-            const buffer = new ArrayBuffer(44 + pcm16.length * 2);
-            const view = new DataView(buffer);
-            
-            function writeString(view, offset, string) {
-                for (let i = 0; i < string.length; i++) {
-                    view.setUint8(offset + i, string.charCodeAt(i));
-                }
-            }
-            
-            writeString(view, 0, 'RIFF');
-            view.setUint32(4, 36 + pcm16.length * 2, true);
-            writeString(view, 8, 'WAVE');
-            writeString(view, 12, 'fmt ');
-            view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true);
-            view.setUint16(22, 1, true);
-            view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate * 2, true);
-            view.setUint16(32, 2, true);
-            view.setUint16(34, 16, true);
-            writeString(view, 36, 'data');
-            view.setUint32(40, pcm16.length * 2, true);
-            
-            let offset = 44;
-            for (let i = 0; i < pcm16.length; i++, offset += 2) {
-                view.setInt16(offset, pcm16[i], true);
-            }
-            return new Blob([view], { type: 'audio/wav' });
-        }
-
-        aiSendBtn.addEventListener('click', () => {
-            const text = aiInput.value.trim();
-            if(text) {
-                sendAiMessage(text);
-                aiInput.value = '';
-            }
-        });
-
-        aiInput.addEventListener('keypress', (e) => {
-            if(e.key === 'Enter') {
-                aiSendBtn.click();
-            }
-        });
-
-        const chatHistory = [];
-
-        async function sendAiMessage(userPrompt) {
-            const userMsgDiv = document.createElement('div');
-            userMsgDiv.className = 'bg-black/60 border border-gray-800 p-4 rounded-xl ml-8';
-            userMsgDiv.innerHTML = `<p class="text-pink-400 font-orbitron text-xs mb-1">OPERATOR / USER</p><p class="text-gray-200">${escapeHtml(userPrompt)}</p>`;
-            aiChatMessages.appendChild(userMsgDiv);
-            aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
-
-            chatHistory.push({ role: "user", parts: [{ text: userPrompt }] });
-
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'bg-cyan-950/20 border border-cyan-500/20 p-4 rounded-xl mr-8 animate-pulse';
-            loadingDiv.innerHTML = `<p class="text-cyan-400 font-orbitron text-xs mb-1">X42 NEURAL CORE</p><p class="text-cyan-200 text-xs">Synthesizing response through neural frequency...</p>`;
-            aiChatMessages.appendChild(loadingDiv);
-            aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
-
-            try {
-                const systemPrompt = "You are the advanced AI neural companion of X42 [PROJEXT 42]. Your mission is to support innovators, visionaries, and changemakers dealing with burnout and systemic challenges. You champion world peace, smart economies, environmental healing (cooling fires, saving water), and achieving the 3.5% critical mass for positive global transformation. Keep responses grounded, visionary, empathetic, and inspiring.";
-                
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=`;
-                const payload = {
-                    contents: chatHistory,
-                    systemInstruction: { parts: [{ text: systemPrompt }] }
-                };
-
-                let response = null;
-                let success = false;
-                let delay = 1000;
-
-                for(let attempt = 0; attempt < 3; attempt++) {
-                    try {
-                        response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        if(response.ok) {
-                            success = true;
-                            break;
-                        }
-                    } catch(err) {}
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    delay *= 2;
-                }
-
-                aiChatMessages.removeChild(loadingDiv);
-
-                if(success && response) {
-                    const result = await response.json();
-                    const candidate = result.candidates?.[0];
-                    if(candidate && candidate.content?.parts?.[0]?.text) {
-                        const aiText = candidate.content.parts[0].text;
-                        chatHistory.push(candidate.content);
-
-                        const aiMsgDiv = document.createElement('div');
-                        aiMsgDiv.className = 'bg-cyan-950/40 border border-cyan-500/30 p-4 rounded-xl mr-8';
-                        aiMsgDiv.innerHTML = `<p class="text-cyan-300 font-orbitron text-xs mb-1">X42 NEURAL CORE</p><p class="text-gray-200 leading-relaxed">${escapeHtml(aiText)}</p>`;
-                        aiChatMessages.appendChild(aiMsgDiv);
-                    } else {
-                        throw new Error("Invalid response format");
-                    }
-                } else {
-                    throw new Error("Network error");
-                }
-            } catch(error) {
-                const errDiv = document.createElement('div');
-                errDiv.className = 'bg-red-950/40 border border-red-500/30 p-4 rounded-xl mr-8';
-                errDiv.innerHTML = `<p class="text-red-400 font-orbitron text-xs mb-1">SYSTEM WARNING</p><p class="text-gray-300">Neural link fluctuation detected. Let's keep moving forward—your vision for world peace and environmental healing is unstoppable.</p>`;
-                aiChatMessages.appendChild(errDiv);
-            }
-            aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
-        }
-
-        function escapeHtml(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return text.replace(/[&<>"']/g, m => map[m]);
-        }
-
-}
-
-        // --- STREAMING_CHUNK:Main Animation & Render Loop... ---
-        const clock = new THREE.Clock();
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const time = clock.getElapsedTime();
-
-            currentGridColor.lerp(targetGridColor, 0.05);
-            gridMaterial.color = currentGridColor;
-            particlesMaterial.color = currentGridColor;
-
-            gridSpeed += (gridSpeedTarget - gridSpeed) * 0.05;
-            grid.position.z += gridSpeed * 50;
-            if(grid.position.z > 10) grid.position.z = 0;
-
-            nodes.forEach(node => {
-                node.rotation.x += node.userData.rx;
-                node.rotation.y += node.userData.ry;
-                node.position.y = node.userData.baseY + Math.sin(time * 2 + node.position.x) * 1.5;
-                if(cardStates.filter(Boolean).length > 0) {
-                    node.material.color.lerp(targetGridColor, 0.02);
-                } else {
-                    node.material.color.lerp(new THREE.Color(0xffffff), 0.02);
-                }
-            });
-
-            particlesMesh.rotation.y = time * 0.02;
-
-            if(audioEngine.ready) {
-                const activeNodes = cardStates.filter(Boolean).length;
-                const bars = visContainer.children;
-                for(let i=0; i<bars.length; i++) {
-                    let height = Math.random() * 8 + 4;
-                    if(activeNodes > 0) {
-                        height += Math.random() * (activeNodes * 6);
-                        if(Math.sin(time * 8 + i) > 0.5) height += 12;
-                    }
-                    bars[i].style.height = `${height}px`;
-                    bars[i].style.backgroundColor = '#' + currentGridColor.getHexString();
-                }
-            }
-
-            renderer.render(scene, camera);
-        }
-
-        animate();
     </script>
 </body>
 </html>
