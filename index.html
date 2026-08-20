@@ -812,6 +812,11 @@
             return text.replace(/[&<>"']/g, m => map[m]);
         }
 
+        //aufio fix
+        if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+}
+
         // --- STREAMING_CHUNK:Main Animation & Render Loop... ---
         const clock = new THREE.Clock();
 
