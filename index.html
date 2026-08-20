@@ -621,6 +621,24 @@
 
             </div>
 
+            <!-- Replace your <div id="audio-visualizer"> with this -->
+<canvas id="visualizer-canvas" class="w-full h-32"></canvas>
+
+<script>
+    const canvas = document.getElementById('visualizer-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    function draw() {
+        requestAnimationFrame(draw);
+        // We can draw waves here that react to audioEngine.synths
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#00f3ff';
+        ctx.beginPath();
+        // Dynamic frequency drawing goes here
+        ctx.stroke();
+    }
+    draw();
+</script>
             <!-- AUDIO PLAYER -->
             <div
                 id="audio-brief-player-container"
